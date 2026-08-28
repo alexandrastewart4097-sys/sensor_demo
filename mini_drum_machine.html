@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini Drum Machine</title>
+
+  <style>
+    /* =========================
+       CSS = HOW IT LOOKS
+       ========================= */
+
+    :root {
+      --bg: #10131a;
+      --panel: #191e29;
+      --panel-2: #232a38;
+      --text: #f7f8fb;
+      --muted: #9aa4b2;
+      --accent: #ff6b35;
+      --accent-2: #ffd166;
+      --border: #343c4d;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top, #20283a 0%, #10131a 45%);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .machine {
+      width: min(920px, 100%);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.35);
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.7rem, 5vw, 2.6rem);
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin-top: 6px;
+      font-size: .95rem;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .control-btn {
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+    }
+
+    .control-btn:hover {
+      border-color: var(--accent);
+    }
+
+    .control-btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #111;
+      font-weight: 800;
+    }
+
+    .tempo-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    #tempo {
+      width: 80px;
+      background: #0e1118;
+      color: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px;
+    }
+
+    .pads {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 26px;
+    }
+
+    .pad {
+      min-height: 130px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: linear-gradient(145deg, #2b3342, #1d2330);
+      color: white;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform .08s ease, border-color .08s ease, background .08s ease;
+    }
+
+    .pad:hover {
+      border-color: var(--accent-2);
+    }
+
+    .pad.active {
+      transform: scale(.97);
+      background: linear-gradient(145deg, var(--accent), #d94a16);
+      border-color: var(--accent-2);
+    }
+
+    .pad-name {
+      display: block;
+      font-size: 1.05rem;
+      font-weight: 800;
+    }
+
+    .pad-key {
+      display: block;
+      color: var(--muted);
+      font-size: .78rem;
+      margin-top: 8px;
+    }
+
+    .pad.active .pad-key {
+      color: #211;
+    }
+
+    .sequencer-title {
+      margin: 0 0 12px;
+      font-size: 1.05rem;
+    }
+
+    .sequencer {
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+
+    .track {
+      display: grid;
+      grid-template-columns: 92px repeat(8, 44px);
+      gap: 7px;
+      align-items: center;
+      margin-bottom: 9px;
+      min-width: 540px;
+    }
+
+    .track-label {
+      color: var(--muted);
+      font-size: .85rem;
+      font-weight: bold;
+    }
+
+    .step {
+      width: 44px;
+      height: 44px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: #0f131b;
+      cursor: pointer;
+    }
+
+    .step.on {
+      background: var(--accent);
+      border-color: var(--accent-2);
+    }
+
+    .step.playing {
+      outline: 3px solid var(--accent-2);
+      outline-offset: 2px;
+    }
+
+    .tip {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 700px) {
+      .pads {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .pad {
+        min-height: 110px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================
+       HTML = WHAT YOU SEE
+       ========================= -->
+
+  <main class="machine">
+    <div class="topbar">
+      <div>
+        <h1>🥁 Mini Drum Machine</h1>
+        <div class="subtitle">Tap the pads, use your keyboard, or build an 8-step beat.</div>
+      </div>
+
+      <div class="controls">
+        <button class="control-btn primary" id="playBtn">▶ Play Beat</button>
+        <button class="control-btn" id="clearBtn">Clear</button>
+
+        <div class="tempo-box">
+          <label for="tempo">BPM</label>
+          <input id="tempo" type="number" min="50" max="200" value="110">
+        </div>
+      </div>
+    </div>
+
+    <section class="pads">
+      <button class="pad" data-sound="kick" data-key="A">
+        <span class="pad-name">Kick</span>
+        <span class="pad-key">Keyboard: A</span>
+      </button>
+
+      <button class="pad" data-sound="snare" data-key="S">
+        <span class="pad-name">Snare</span>
+        <span class="pad-key">Keyboard: S</span>
+      </button>
+
+      <button class="pad" data-sound="hat" data-key="D">
+        <span class="pad-name">Hi-Hat</span>
+        <span class="pad-key">Keyboard: D</span>
+      </button>
+
+      <button class="pad" data-sound="clap" data-key="F">
+        <span class="pad-name">Clap</span>
+        <span class="pad-key">Keyboard: F</span>
+      </button>
+    </section>
+
+    <h2 class="sequencer-title">8-Step Sequencer</h2>
+
+    <section class="sequencer" id="sequencer"></section>
+
+    <div class="tip">
+      Try this: turn on Kick steps 1 and 5, Snare steps 3 and 7, and Hi-Hat on every step.
+    </div>
+  </main>
+
+  <script>
+    /* =========================
+       JAVASCRIPT = WHAT IT DOES
+       ========================= */
+
+    // Web Audio lets us create sounds without needing MP3 files.
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    let audioContext = null;
+
+    const pads = [...document.querySelectorAll(".pad")];
+    const sequencer = document.getElementById("sequencer");
+    const playBtn = document.getElementById("playBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const tempoInput = document.getElementById("tempo");
+
+    const tracks = ["kick", "snare", "hat", "clap"];
+    const labels = {
+      kick: "Kick",
+      snare: "Snare",
+      hat: "Hi-Hat",
+      clap: "Clap"
+    };
+
+    const pattern = {
+      kick:  [true, false, false, false, true, false, false, false],
+      snare: [false, false, true, false, false, false, true, false],
+      hat:   [true, true, true, true, true, true, true, true],
+      clap:  [false, false, false, false, false, false, false, false]
+    };
+
+    let isPlaying = false;
+    let currentStep = 0;
+    let timer = null;
+
+    function getAudioContext() {
+      if (!audioContext) {
+        audioContext = new AudioContextClass();
+      }
+
+      if (audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+
+      return audioContext;
+    }
+
+    // -------------------------
+    // DRUM SOUNDS
+    // -------------------------
+
+    function playKick() {
+      const ctx = getAudioContext();
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = "sine";
+
+      osc.frequency.setValueAtTime(150, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(45, ctx.currentTime + 0.18);
+
+      gain.gain.setValueAtTime(1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start();
+      osc.stop(ctx.currentTime + 0.25);
+    }
+
+    function playSnare() {
+      const ctx = getAudioContext();
+
+      // Noise part
+      const bufferSize = ctx.sampleRate * 0.2;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+
+      const noise = ctx.createBufferSource();
+      const noiseFilter = ctx.createBiquadFilter();
+      const noiseGain = ctx.createGain();
+
+      noise.buffer = buffer;
+      noiseFilter.type = "highpass";
+      noiseFilter.frequency.value = 1200;
+
+      noiseGain.gain.setValueAtTime(0.75, ctx.currentTime);
+      noiseGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.18);
+
+      noise.connect(noiseFilter);
+      noiseFilter.connect(noiseGain);
+      noiseGain.connect(ctx.destination);
+
+      // Body part
+      const osc = ctx.createOscillator();
+      const oscGain = ctx.createGain();
+
+      osc.type = "triangle";
+      osc.frequency.value = 180;
+
+      oscGain.gain.setValueAtTime(0.55, ctx.currentTime);
+      oscGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
+
+      osc.connect(oscGain);
+      oscGain.connect(ctx.destination);
+
+      noise.start();
+      osc.start();
+
+      noise.stop(ctx.currentTime + 0.2);
+      osc.stop(ctx.currentTime + 0.15);
+    }
+
+    function playHat() {
+      const ctx = getAudioContext();
+
+      const bufferSize = ctx.sampleRate * 0.08;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+
+      const noise = ctx.createBufferSource();
+      const filter = ctx.createBiquadFilter();
+      const gain = ctx.createGain();
+
+      noise.buffer = buffer;
+      filter.type = "highpass";
+      filter.frequency.value = 7000;
+
+      gain.gain.setValueAtTime(0.28, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.07);
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+
+      noise.start();
+      noise.stop(ctx.currentTime + 0.08);
+    }
+
+    function playClap() {
+      const ctx = getAudioContext();
+
+      // Make several tiny noise bursts.
+      [0, 0.025, 0.05].forEach(delay => {
+        const bufferSize = ctx.sampleRate * 0.09;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+
+        const source = ctx.createBufferSource();
+        const filter = ctx.createBiquadFilter();
+        const gain = ctx.createGain();
+
+        source.buffer = buffer;
+        filter.type = "bandpass";
+        filter.frequency.value = 1600;
+        filter.Q.value = 0.7;
+
+        gain.gain.setValueAtTime(0.38, ctx.currentTime + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.08);
+
+        source.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+
+        source.start(ctx.currentTime + delay);
+        source.stop(ctx.currentTime + delay + 0.09);
+      });
+    }
+
+    function playSound(sound) {
+      if (sound === "kick") playKick();
+      if (sound === "snare") playSnare();
+      if (sound === "hat") playHat();
+      if (sound === "clap") playClap();
+
+      flashPad(sound);
+    }
+
+    // -------------------------
+    // PAD ANIMATION
+    // -------------------------
+
+    function flashPad(sound) {
+      const pad = document.querySelector(`.pad[data-sound="${sound}"]`);
+      if (!pad) return;
+
+      pad.classList.add("active");
+      setTimeout(() => pad.classList.remove("active"), 90);
+    }
+
+    // -------------------------
+    // BUILD THE SEQUENCER
+    // -------------------------
+
+    function buildSequencer() {
+      sequencer.innerHTML = "";
+
+      tracks.forEach(track => {
+        const row = document.createElement("div");
+        row.className = "track";
+
+        const label = document.createElement("div");
+        label.className = "track-label";
+        label.textContent = labels[track];
+
+        row.appendChild(label);
+
+        pattern[track].forEach((isOn, index) => {
+          const step = document.createElement("button");
+          step.className = "step" + (isOn ? " on" : "");
+          step.type = "button";
+          step.dataset.track = track;
+          step.dataset.step = index;
+          step.setAttribute("aria-label", `${labels[track]} step ${index + 1}`);
+
+          step.addEventListener("click", () => {
+            pattern[track][index] = !pattern[track][index];
+            step.classList.toggle("on", pattern[track][index]);
+          });
+
+          row.appendChild(step);
+        });
+
+        sequencer.appendChild(row);
+      });
+    }
+
+    // -------------------------
+    // PLAY THE BEAT
+    // -------------------------
+
+    function runStep() {
+      document.querySelectorAll(".step").forEach(step => {
+        step.classList.toggle(
+          "playing",
+          Number(step.dataset.step) === currentStep
+        );
+      });
+
+      tracks.forEach(track => {
+        if (pattern[track][currentStep]) {
+          playSound(track);
+        }
+      });
+
+      currentStep = (currentStep + 1) % 8;
+    }
+
+    function getStepTime() {
+      const bpm = Math.max(50, Math.min(200, Number(tempoInput.value) || 110));
+
+      // 8 steps = eighth notes.
+      // Quarter note in ms = 60000 / BPM
+      // Eighth note = half of that.
+      return (60000 / bpm) / 2;
+    }
+
+    function startBeat() {
+      if (isPlaying) return;
+
+      isPlaying = true;
+      playBtn.textContent = "■ Stop Beat";
+
+      runStep();
+      timer = setInterval(runStep, getStepTime());
+    }
+
+    function stopBeat() {
+      isPlaying = false;
+      playBtn.textContent = "▶ Play Beat";
+
+      clearInterval(timer);
+      timer = null;
+      currentStep = 0;
+
+      document.querySelectorAll(".step").forEach(step => {
+        step.classList.remove("playing");
+      });
+    }
+
+    function restartTimerIfPlaying() {
+      if (!isPlaying) return;
+
+      clearInterval(timer);
+      timer = setInterval(runStep, getStepTime());
+    }
+
+    // -------------------------
+    // CONTROLS
+    // -------------------------
+
+    pads.forEach(pad => {
+      pad.addEventListener("click", () => {
+        playSound(pad.dataset.sound);
+      });
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.repeat) return;
+
+      const key = event.key.toUpperCase();
+      const pad = pads.find(p => p.dataset.key === key);
+
+      if (pad) {
+        playSound(pad.dataset.sound);
+      }
+
+      // Spacebar toggles playback.
+      if (event.code === "Space" && document.activeElement.tagName !== "INPUT") {
+        event.preventDefault();
+
+        if (isPlaying) stopBeat();
+        else startBeat();
+      }
+    });
+
+    playBtn.addEventListener("click", () => {
+      if (isPlaying) stopBeat();
+      else startBeat();
+    });
+
+    clearBtn.addEventListener("click", () => {
+      tracks.forEach(track => {
+        pattern[track] = pattern[track].map(() => false);
+      });
+
+      buildSequencer();
+    });
+
+    tempoInput.addEventListener("change", () => {
+      tempoInput.value = Math.max(
+        50,
+        Math.min(200, Number(tempoInput.value) || 110)
+      );
+
+      restartTimerIfPlaying();
+    });
+
+    buildSequencer();
+  </script>
+</body>
+</html>
