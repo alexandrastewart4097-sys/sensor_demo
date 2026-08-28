@@ -1,0 +1,2089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- This is what shows in the browser tab -->
+  <title>Florida Panthers Stat Lab</title>
+
+  <style>
+    /* =========================================================
+       CSS = HOW THE WEBSITE LOOKS
+       Panthers-inspired palette:
+       Red  #C8102E
+       Navy #041E42
+       Gold #B9975B
+       ========================================================= */
+
+    :root {
+      --panthers-red: #C8102E;
+      --panthers-navy: #041E42;
+      --panthers-gold: #B9975B;
+      --ice: #F5F8FC;
+      --white: #FFFFFF;
+      --ink: #101828;
+      --muted: #667085;
+      --border: #D7DEE8;
+      --green: #16835B;
+      --danger: #B42318;
+      --shadow: 0 12px 30px rgba(4, 30, 66, .10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+                   "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(200,16,46,.08), transparent 30%),
+        radial-gradient(circle at 90% 15%, rgba(185,151,91,.10), transparent 28%),
+        var(--ice);
+      color: var(--ink);
+    }
+
+    button,
+    select,
+    input {
+      font: inherit;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    /* ---------- HERO ---------- */
+
+    .hero {
+      background:
+        linear-gradient(115deg, rgba(4,30,66,.98), rgba(4,30,66,.91)),
+        repeating-linear-gradient(
+          90deg,
+          transparent 0,
+          transparent 48px,
+          rgba(255,255,255,.025) 49px,
+          rgba(255,255,255,.025) 50px
+        );
+      color: white;
+      border-bottom: 5px solid var(--panthers-red);
+    }
+
+    .hero-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: auto;
+      padding: 28px 0 34px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand-logo-wrap {
+      width: 88px;
+      height: 88px;
+      border-radius: 24px;
+      background: white;
+      border: 3px solid var(--panthers-gold);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.20);
+    }
+
+    .brand-logo {
+      width: 76px;
+      height: 76px;
+      object-fit: contain;
+    }
+
+    .brand h1 {
+      font-size: clamp(1.7rem, 4vw, 3.1rem);
+      margin: 0;
+      letter-spacing: -.04em;
+      line-height: .95;
+    }
+
+    .brand p {
+      margin: 9px 0 0;
+      color: #D8E3F3;
+      font-size: .98rem;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: .88rem;
+      color: #EAF1FA;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #7CE7B3;
+      box-shadow: 0 0 0 5px rgba(124,231,179,.12);
+    }
+
+    .hero-copy {
+      margin-top: 28px;
+      max-width: 780px;
+    }
+
+    .eyebrow {
+      color: #E8CC97;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .13em;
+      font-size: .72rem;
+    }
+
+    .hero-copy h2 {
+      margin: 8px 0 8px;
+      font-size: clamp(1.5rem, 3vw, 2.25rem);
+    }
+
+    .hero-copy p {
+      margin: 0;
+      color: #D4DEEB;
+      line-height: 1.65;
+    }
+
+    /* ---------- NAV ---------- */
+
+    .nav {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .nav-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: auto;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 10px 0;
+      scrollbar-width: thin;
+    }
+
+    .nav a {
+      text-decoration: none;
+      white-space: nowrap;
+      font-weight: 750;
+      font-size: .9rem;
+      padding: 10px 13px;
+      border-radius: 9px;
+      color: var(--panthers-navy);
+    }
+
+    .nav a:hover {
+      background: #F1F4F8;
+    }
+
+    /* ---------- GENERAL LAYOUT ---------- */
+
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 70px;
+    }
+
+    section {
+      scroll-margin-top: 80px;
+      margin: 0 0 42px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      color: var(--panthers-navy);
+      font-size: clamp(1.35rem, 3vw, 2rem);
+      letter-spacing: -.03em;
+    }
+
+    .section-heading p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #FFF5F6;
+      color: var(--panthers-red);
+      border: 1px solid #F7C9D1;
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: .78rem;
+      font-weight: 800;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    /* ---------- SUMMARY CARDS ---------- */
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+    }
+
+    .stat-card {
+      padding: 17px;
+      min-height: 125px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::after {
+      content: "";
+      position: absolute;
+      width: 54px;
+      height: 54px;
+      right: -18px;
+      top: -18px;
+      border-radius: 50%;
+      background: rgba(200,16,46,.08);
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .stat-value {
+      margin-top: 10px;
+      font-size: 1.7rem;
+      line-height: 1;
+      font-weight: 900;
+      color: var(--panthers-navy);
+      letter-spacing: -.04em;
+    }
+
+    .stat-sub {
+      margin-top: 9px;
+      font-size: .82rem;
+      color: var(--muted);
+    }
+
+    .positive {
+      color: var(--green) !important;
+    }
+
+    .negative {
+      color: var(--danger) !important;
+    }
+
+    /* ---------- CONTROLS ---------- */
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      align-items: end;
+      flex-wrap: wrap;
+    }
+
+    .field {
+      min-width: 190px;
+      flex: 1;
+    }
+
+    label {
+      display: block;
+      font-size: .78rem;
+      font-weight: 800;
+      color: var(--panthers-navy);
+      margin-bottom: 6px;
+    }
+
+    select,
+    input[type="search"] {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid #BFC9D6;
+      border-radius: 10px;
+      background: white;
+      padding: 10px 12px;
+      color: var(--ink);
+      outline: none;
+    }
+
+    select:focus,
+    input:focus {
+      border-color: var(--panthers-red);
+      box-shadow: 0 0 0 3px rgba(200,16,46,.12);
+    }
+
+    .segmented {
+      display: inline-flex;
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid var(--border);
+      background: white;
+      border-radius: 12px;
+    }
+
+    .segmented button {
+      min-height: 38px;
+      border: 0;
+      border-radius: 8px;
+      padding: 7px 11px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .segmented button.active {
+      background: var(--panthers-navy);
+      color: white;
+    }
+
+    /* ---------- TEAM VS TEAM ---------- */
+
+    .compare-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.45fr 1fr;
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .team-panel {
+      padding: 21px;
+      text-align: center;
+    }
+
+    .team-panel.panthers {
+      border-top: 4px solid var(--panthers-red);
+    }
+
+    .team-logo {
+      height: 74px;
+      max-width: 100px;
+      object-fit: contain;
+      margin-bottom: 10px;
+    }
+
+    .team-name {
+      margin: 0;
+      font-weight: 900;
+      color: var(--panthers-navy);
+      font-size: 1.12rem;
+    }
+
+    .team-record {
+      color: var(--muted);
+      margin-top: 5px;
+      font-size: .9rem;
+    }
+
+    .big-points {
+      font-size: 2.5rem;
+      font-weight: 950;
+      color: var(--panthers-navy);
+      margin: 12px 0 2px;
+      letter-spacing: -.05em;
+    }
+
+    .comparison-bars {
+      padding: 18px;
+    }
+
+    .metric-row {
+      margin-bottom: 15px;
+    }
+
+    .metric-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .metric-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: .78rem;
+      font-weight: 800;
+      color: #475467;
+      margin-bottom: 6px;
+    }
+
+    .dual-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3px;
+      height: 13px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #EEF2F6;
+    }
+
+    .bar-left-wrap,
+    .bar-right-wrap {
+      background: #EEF2F6;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .bar-left-wrap {
+      justify-content: flex-end;
+    }
+
+    .bar-left {
+      height: 100%;
+      background: var(--panthers-red);
+      border-radius: 999px 0 0 999px;
+      transition: width .45s ease;
+    }
+
+    .bar-right {
+      height: 100%;
+      background: var(--panthers-gold);
+      border-radius: 0 999px 999px 0;
+      transition: width .45s ease;
+    }
+
+    /* ---------- TABLES ---------- */
+
+    .table-card {
+      overflow: hidden;
+    }
+
+    .table-tools {
+      padding: 14px;
+      display: flex;
+      gap: 10px;
+      align-items: end;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
+      background: #FBFCFE;
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 790px;
+    }
+
+    th {
+      text-align: left;
+      background: var(--panthers-navy);
+      color: white;
+      font-size: .75rem;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      padding: 12px 14px;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #E7ECF2;
+      font-size: .9rem;
+      white-space: nowrap;
+    }
+
+    tbody tr:hover {
+      background: #FBF5F6;
+    }
+
+    tbody tr.highlight {
+      background: #FFF1F3;
+      font-weight: 800;
+    }
+
+    .mini-team {
+      display: flex;
+      gap: 9px;
+      align-items: center;
+    }
+
+    .mini-team img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+
+    /* ---------- PLAYER LEADERS ---------- */
+
+    .leader-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .leader-card {
+      padding: 19px;
+      position: relative;
+      overflow: hidden;
+      border-top: 4px solid var(--panthers-gold);
+    }
+
+    .leader-rank {
+      position: absolute;
+      right: 16px;
+      top: 12px;
+      color: #D7DFEA;
+      font-size: 2.4rem;
+      font-weight: 950;
+    }
+
+    .leader-name {
+      margin: 8px 0 2px;
+      font-weight: 900;
+      color: var(--panthers-navy);
+      font-size: 1.05rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .leader-pos {
+      color: var(--muted);
+      font-size: .8rem;
+    }
+
+    .leader-number {
+      margin-top: 13px;
+      font-size: 2.25rem;
+      color: var(--panthers-red);
+      font-weight: 950;
+      letter-spacing: -.04em;
+    }
+
+    /* ---------- PLAYER COMPARE ---------- */
+
+    .player-compare {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr 1fr;
+      gap: 14px;
+    }
+
+    .player-card {
+      padding: 20px;
+    }
+
+    .jersey {
+      width: 58px;
+      height: 58px;
+      border-radius: 17px;
+      background: var(--panthers-navy);
+      color: white;
+      border: 3px solid var(--panthers-gold);
+      display: grid;
+      place-items: center;
+      font-size: 1.35rem;
+      font-weight: 950;
+      margin-bottom: 12px;
+    }
+
+    .player-card.other .jersey {
+      background: #344054;
+    }
+
+    .player-card h3 {
+      margin: 0;
+      color: var(--panthers-navy);
+      font-size: 1.1rem;
+    }
+
+    .player-card p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: .84rem;
+    }
+
+    .winner {
+      display: inline-block;
+      margin-top: 11px;
+      font-size: .75rem;
+      font-weight: 900;
+      color: var(--green);
+      background: #ECFDF3;
+      border: 1px solid #ABEFC6;
+      padding: 6px 8px;
+      border-radius: 999px;
+    }
+
+    /* ---------- HISTORY ---------- */
+
+    .history-layout {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 14px;
+    }
+
+    .chart-card {
+      padding: 20px;
+      min-width: 0;
+    }
+
+    .bar-chart {
+      display: flex;
+      align-items: end;
+      gap: 13px;
+      height: 260px;
+      border-bottom: 1px solid var(--border);
+      border-left: 1px solid var(--border);
+      padding: 18px 14px 0;
+      margin-top: 18px;
+    }
+
+    .season-bar-wrap {
+      flex: 1;
+      min-width: 0;
+      height: 100%;
+      display: flex;
+      align-items: end;
+      justify-content: center;
+      position: relative;
+    }
+
+    .season-bar {
+      width: min(54px, 78%);
+      min-height: 3px;
+      background: linear-gradient(to top, var(--panthers-navy), var(--panthers-red));
+      border-radius: 8px 8px 0 0;
+      position: relative;
+      transition: height .45s ease;
+    }
+
+    .season-value {
+      position: absolute;
+      top: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: .78rem;
+      font-weight: 900;
+      color: var(--panthers-navy);
+    }
+
+    .season-label {
+      position: absolute;
+      bottom: -31px;
+      font-size: .72rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .history-notes {
+      padding: 20px;
+    }
+
+    .history-item {
+      padding: 13px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .history-item:last-child {
+      border-bottom: 0;
+    }
+
+    .history-item strong {
+      color: var(--panthers-navy);
+    }
+
+    /* ---------- RECORD BOOK ---------- */
+
+    .records-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .record-card {
+      padding: 18px;
+    }
+
+    .record-card h3 {
+      margin: 0 0 12px;
+      color: var(--panthers-navy);
+      font-size: .95rem;
+    }
+
+    .record-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 7px 0;
+      border-bottom: 1px dashed #D9E1EA;
+      font-size: .83rem;
+    }
+
+    .record-line:last-child {
+      border-bottom: 0;
+    }
+
+    .record-line span:last-child {
+      color: var(--panthers-red);
+      font-weight: 900;
+    }
+
+    /* ---------- GLOSSARY ---------- */
+
+    details {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+
+    summary {
+      cursor: pointer;
+      padding: 14px 16px;
+      font-weight: 850;
+      color: var(--panthers-navy);
+    }
+
+    details p {
+      padding: 0 16px 15px;
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ---------- FOOTER ---------- */
+
+    footer {
+      background: var(--panthers-navy);
+      color: #CFD9E8;
+      border-top: 4px solid var(--panthers-red);
+    }
+
+    .footer-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: auto;
+      padding: 28px 0;
+      line-height: 1.6;
+      font-size: .85rem;
+    }
+
+    .footer-inner strong {
+      color: white;
+    }
+
+    .error-box {
+      display: none;
+      background: #FFF4E8;
+      border: 1px solid #F9D3A3;
+      color: #7A2E0E;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin: 14px 0;
+      font-size: .88rem;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+
+    @media (max-width: 1050px) {
+      .summary-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .records-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 820px) {
+      .compare-layout,
+      .player-compare,
+      .history-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .comparison-bars {
+        order: 3;
+      }
+
+      .leader-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 610px) {
+      .hero-inner,
+      main,
+      .nav-inner,
+      .footer-inner {
+        width: min(100% - 22px, 1180px);
+      }
+
+      .brand-logo-wrap {
+        width: 68px;
+        height: 68px;
+        border-radius: 18px;
+      }
+
+      .brand-logo {
+        width: 58px;
+        height: 58px;
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .records-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        align-items: stretch;
+      }
+
+      .field {
+        min-width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================================================
+       HTML = THE STRUCTURE / CONTENT OF THE WEBSITE
+       ========================================================= -->
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="topbar">
+        <div class="brand">
+          <div class="brand-logo-wrap">
+            <!-- The logo is loaded from the NHL's asset server -->
+            <img
+              class="brand-logo"
+              src="https://assets.nhle.com/logos/nhl/svg/FLA_light.svg"
+              alt="Florida Panthers logo"
+              onerror="this.style.display='none'; this.parentElement.textContent='FLA';"
+            >
+          </div>
+
+          <div>
+            <h1>Panthers Stat Lab</h1>
+            <p>Florida Panthers vs. the NHL — team, player and franchise analytics</p>
+          </div>
+        </div>
+
+        <div class="status">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="dataStatus">Connecting to NHL data…</span>
+        </div>
+      </div>
+
+      <div class="hero-copy">
+        <div class="eyebrow">Interactive Hockey Dashboard</div>
+        <h2>How do the Cats stack up?</h2>
+        <p>
+          Compare Florida with every NHL club, sort the league table, inspect Panthers
+          player leaders, compare players head-to-head, and look back at recent franchise history.
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="#overview">Overview</a>
+      <a href="#team-compare">Team Compare</a>
+      <a href="#standings">League Table</a>
+      <a href="#players">Players</a>
+      <a href="#player-compare">Player Compare</a>
+      <a href="#history">History</a>
+      <a href="#records">Records</a>
+      <a href="#glossary">Stat Guide</a>
+    </div>
+  </nav>
+
+  <main>
+
+    <div class="error-box" id="errorBox"></div>
+
+    <!-- ==================== OVERVIEW ==================== -->
+    <section id="overview">
+      <div class="section-heading">
+        <div>
+          <span class="badge">🐾 Florida Focus</span>
+          <h2 style="margin-top:9px;">Season Overview</h2>
+          <p id="seasonText">Latest completed NHL regular season</p>
+        </div>
+      </div>
+
+      <div class="summary-grid">
+        <div class="card stat-card">
+          <div class="stat-label">Record</div>
+          <div class="stat-value" id="recordValue">40-38-4</div>
+          <div class="stat-sub">W-L-OTL</div>
+        </div>
+
+        <div class="card stat-card">
+          <div class="stat-label">Points</div>
+          <div class="stat-value" id="pointsValue">84</div>
+          <div class="stat-sub" id="pointsSub">82 games</div>
+        </div>
+
+        <div class="card stat-card">
+          <div class="stat-label">Goals For</div>
+          <div class="stat-value" id="gfValue">246</div>
+          <div class="stat-sub" id="gfSub">3.00 per game</div>
+        </div>
+
+        <div class="card stat-card">
+          <div class="stat-label">Goals Against</div>
+          <div class="stat-value" id="gaValue">274</div>
+          <div class="stat-sub" id="gaSub">3.34 per game</div>
+        </div>
+
+        <div class="card stat-card">
+          <div class="stat-label">Goal Differential</div>
+          <div class="stat-value negative" id="diffValue">-28</div>
+          <div class="stat-sub">GF minus GA</div>
+        </div>
+
+        <div class="card stat-card">
+          <div class="stat-label">League Rank</div>
+          <div class="stat-value" id="rankValue">25th</div>
+          <div class="stat-sub" id="rankSub">7th Atlantic</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TEAM COMPARE ==================== -->
+    <section id="team-compare">
+      <div class="section-heading">
+        <div>
+          <h2>Florida vs. Any NHL Team</h2>
+          <p>Select an opponent and JavaScript redraws the comparison instantly.</p>
+        </div>
+
+        <div class="controls">
+          <div class="field">
+            <label for="teamSelect">Compare Florida with</label>
+            <select id="teamSelect">
+              <option value="TBL">Tampa Bay Lightning</option>
+              <option value="DAL">Dallas Stars</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="compare-layout">
+        <div class="card team-panel panthers">
+          <img class="team-logo" id="flaCompareLogo"
+               src="https://assets.nhle.com/logos/nhl/svg/FLA_light.svg"
+               alt="Florida Panthers logo">
+          <h3 class="team-name">Florida Panthers</h3>
+          <div class="team-record" id="flaCompareRecord">40-38-4</div>
+          <div class="big-points" id="flaComparePoints">84</div>
+          <div class="stat-sub">standings points</div>
+        </div>
+
+        <div class="card comparison-bars" id="comparisonBars">
+          <!-- JavaScript inserts metric bars here -->
+        </div>
+
+        <div class="card team-panel">
+          <img class="team-logo" id="otherCompareLogo"
+               src="https://assets.nhle.com/logos/nhl/svg/TBL_light.svg"
+               alt="Comparison team logo">
+          <h3 class="team-name" id="otherCompareName">Tampa Bay Lightning</h3>
+          <div class="team-record" id="otherCompareRecord">50-26-6</div>
+          <div class="big-points" id="otherComparePoints">106</div>
+          <div class="stat-sub">standings points</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== STANDINGS ==================== -->
+    <section id="standings">
+      <div class="section-heading">
+        <div>
+          <h2>NHL League Table</h2>
+          <p>Click a column heading to sort it. Search by team, division or conference.</p>
+        </div>
+      </div>
+
+      <div class="card table-card">
+        <div class="table-tools">
+          <div class="field" style="max-width:360px;">
+            <label for="teamSearch">Search standings</label>
+            <input id="teamSearch" type="search" placeholder="Try Panthers, Atlantic, East…">
+          </div>
+          <div class="badge" id="standingsCount">Showing teams</div>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th data-sort="leagueRank">Rank</th>
+                <th data-sort="name">Team</th>
+                <th data-sort="division">Division</th>
+                <th data-sort="gp">GP</th>
+                <th data-sort="wins">W</th>
+                <th data-sort="losses">L</th>
+                <th data-sort="otl">OTL</th>
+                <th data-sort="points">PTS</th>
+                <th data-sort="gf">GF</th>
+                <th data-sort="ga">GA</th>
+                <th data-sort="diff">DIFF</th>
+                <th data-sort="pointsPct">PTS%</th>
+              </tr>
+            </thead>
+            <tbody id="standingsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== PLAYERS ==================== -->
+    <section id="players">
+      <div class="section-heading">
+        <div>
+          <h2>Panthers Player Leaders</h2>
+          <p>Switch the category and JavaScript reranks the cards and table.</p>
+        </div>
+
+        <div class="segmented" id="leaderButtons" aria-label="Player leaderboard category">
+          <button type="button" class="active" data-stat="points">Points</button>
+          <button type="button" data-stat="goals">Goals</button>
+          <button type="button" data-stat="assists">Assists</button>
+          <button type="button" data-stat="shots">Shots</button>
+        </div>
+      </div>
+
+      <div class="leader-grid" id="leaderGrid"></div>
+
+      <div class="card table-card">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Player</th>
+                <th>Pos</th>
+                <th>GP</th>
+                <th>G</th>
+                <th>A</th>
+                <th>PTS</th>
+                <th>+/-</th>
+                <th>PIM</th>
+                <th>PPG</th>
+                <th>SHG</th>
+                <th>GWG</th>
+                <th>SOG</th>
+                <th>SH%</th>
+              </tr>
+            </thead>
+            <tbody id="panthersPlayersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== PLAYER COMPARE ==================== -->
+    <section id="player-compare">
+      <div class="section-heading">
+        <div>
+          <h2>Player vs. Player</h2>
+          <p>Choose one Panther and one player from the selected comparison team.</p>
+        </div>
+
+        <div class="controls">
+          <div class="field">
+            <label for="pantherPlayerSelect">Panthers player</label>
+            <select id="pantherPlayerSelect"></select>
+          </div>
+
+          <div class="field">
+            <label for="otherPlayerSelect">Opponent player</label>
+            <select id="otherPlayerSelect"></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="player-compare">
+        <div class="card player-card">
+          <div class="jersey" id="leftJersey">13</div>
+          <h3 id="leftPlayerName">Sam Reinhart</h3>
+          <p id="leftPlayerMeta">F • Florida Panthers</p>
+          <span class="winner" id="leftWinner" style="display:none;">Leads comparison</span>
+        </div>
+
+        <div class="card comparison-bars" id="playerComparisonBars">
+          <p style="color:#667085; margin:0;">
+            Opponent player data will appear here after the NHL feed loads.
+          </p>
+        </div>
+
+        <div class="card player-card other">
+          <div class="jersey" id="rightJersey">—</div>
+          <h3 id="rightPlayerName">Select a player</h3>
+          <p id="rightPlayerMeta">Comparison team</p>
+          <span class="winner" id="rightWinner" style="display:none;">Leads comparison</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== HISTORY ==================== -->
+    <section id="history">
+      <div class="section-heading">
+        <div>
+          <h2>Recent Panthers History</h2>
+          <p>Points totals from the last five full regular seasons.</p>
+        </div>
+      </div>
+
+      <div class="history-layout">
+        <div class="card chart-card">
+          <strong style="color:#041E42;">Regular-season points by year</strong>
+
+          <div class="bar-chart" aria-label="Florida Panthers recent season points chart">
+            <div class="season-bar-wrap">
+              <div class="season-bar" style="height:100%;">
+                <span class="season-value">122</span>
+              </div>
+              <span class="season-label">2021-22</span>
+            </div>
+
+            <div class="season-bar-wrap">
+              <div class="season-bar" style="height:75.4%;">
+                <span class="season-value">92</span>
+              </div>
+              <span class="season-label">2022-23</span>
+            </div>
+
+            <div class="season-bar-wrap">
+              <div class="season-bar" style="height:90.2%;">
+                <span class="season-value">110</span>
+              </div>
+              <span class="season-label">2023-24</span>
+            </div>
+
+            <div class="season-bar-wrap">
+              <div class="season-bar" style="height:80.3%;">
+                <span class="season-value">98</span>
+              </div>
+              <span class="season-label">2024-25</span>
+            </div>
+
+            <div class="season-bar-wrap">
+              <div class="season-bar" style="height:68.9%;">
+                <span class="season-value">84</span>
+              </div>
+              <span class="season-label">2025-26</span>
+            </div>
+          </div>
+
+          <p style="margin:42px 0 0; color:#667085; font-size:.82rem;">
+            The height of each bar is calculated as a percentage of the best season shown.
+          </p>
+        </div>
+
+        <div class="card history-notes">
+          <div class="history-item">
+            <strong>2021-22 — 122 points</strong><br>
+            Presidents' Trophy season: 58-18-6.
+          </div>
+
+          <div class="history-item">
+            <strong>2022-23 — 92 points</strong><br>
+            Reached the Stanley Cup Final.
+          </div>
+
+          <div class="history-item">
+            <strong>2023-24 — 110 points</strong><br>
+            Won the Stanley Cup.
+          </div>
+
+          <div class="history-item">
+            <strong>2024-25 — 98 points</strong><br>
+            Won a second consecutive Stanley Cup.
+          </div>
+
+          <div class="history-item">
+            <strong>2025-26 — 84 points</strong><br>
+            Finished 40-38-4 and missed the playoffs.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== RECORDS ==================== -->
+    <section id="records">
+      <div class="section-heading">
+        <div>
+          <h2>Panthers Playoff Record Book</h2>
+          <p>A few franchise postseason leaders for context.</p>
+        </div>
+      </div>
+
+      <div class="records-grid">
+        <div class="card record-card">
+          <h3>All-Time Playoff Goals</h3>
+          <div class="record-line"><span>Carter Verhaeghe</span><span>33</span></div>
+          <div class="record-line"><span>Sam Reinhart</span><span>32</span></div>
+          <div class="record-line"><span>Sam Bennett</span><span>29</span></div>
+          <div class="record-line"><span>Aleksander Barkov</span><span>25</span></div>
+        </div>
+
+        <div class="card record-card">
+          <h3>All-Time Playoff Assists</h3>
+          <div class="record-line"><span>Aleksander Barkov</span><span>56</span></div>
+          <div class="record-line"><span>Matthew Tkachuk</span><span>44</span></div>
+          <div class="record-line"><span>Carter Verhaeghe</span><span>43</span></div>
+          <div class="record-line"><span>Anton Lundell</span><span>34</span></div>
+        </div>
+
+        <div class="card record-card">
+          <h3>All-Time Playoff Points</h3>
+          <div class="record-line"><span>Aleksander Barkov</span><span>81</span></div>
+          <div class="record-line"><span>Carter Verhaeghe</span><span>76</span></div>
+          <div class="record-line"><span>Matthew Tkachuk</span><span>69</span></div>
+          <div class="record-line"><span>Sam Bennett</span><span>59</span></div>
+        </div>
+
+        <div class="card record-card">
+          <h3>Goaltending Playoff Wins</h3>
+          <div class="record-line"><span>Sergei Bobrovsky</span><span>50</span></div>
+          <div class="record-line"><span>John Vanbiesbrouck</span><span>13</span></div>
+          <div class="record-line"><span>Roberto Luongo</span><span>2</span></div>
+          <div class="record-line"><span>José Théodore</span><span>2</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== GLOSSARY ==================== -->
+    <section id="glossary">
+      <div class="section-heading">
+        <div>
+          <h2>What Do the Hockey Stats Mean?</h2>
+          <p>Click any term to open it. This is useful while you learn both hockey and HTML.</p>
+        </div>
+      </div>
+
+      <details>
+        <summary>PTS — Standings Points</summary>
+        <p>An NHL team normally earns 2 points for a win and 1 point for an overtime or shootout loss.</p>
+      </details>
+
+      <details>
+        <summary>GF / GA / DIFF</summary>
+        <p>GF is goals scored, GA is goals allowed, and goal differential is GF minus GA. Positive is generally better.</p>
+      </details>
+
+      <details>
+        <summary>PTS% — Points Percentage</summary>
+        <p>Points earned divided by the maximum possible points. It helps compare teams that have played different numbers of games.</p>
+      </details>
+
+      <details>
+        <summary>G / A / PTS</summary>
+        <p>For skaters: goals, assists, and total points. A player's points equal goals plus assists.</p>
+      </details>
+
+      <details>
+        <summary>+/- — Plus/Minus</summary>
+        <p>A skater gets a plus when on the ice for many even-strength or shorthanded goals for, and a minus for many goals against. It is a context stat, not a complete measure of defense.</p>
+      </details>
+
+      <details>
+        <summary>PIM / PPG / SHG / GWG</summary>
+        <p>PIM = penalty minutes, PPG = power-play goals, SHG = shorthanded goals, and GWG = game-winning goals.</p>
+      </details>
+
+      <details>
+        <summary>SOG / SH%</summary>
+        <p>SOG is shots on goal. Shooting percentage is goals divided by shots on goal, multiplied by 100.</p>
+      </details>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <strong>Panthers Stat Lab</strong><br>
+      Educational fan project. Live data requests use NHL public endpoints when available.
+      Team names, logos and marks belong to their respective owners.
+    </div>
+  </footer>
+
+  <script>
+    /* =========================================================
+       JAVASCRIPT = WHAT THE WEBSITE DOES
+
+       This script:
+       1. Downloads current/latest NHL standings.
+       2. Finds Florida in the standings.
+       3. Fills the overview cards.
+       4. Builds an interactive sortable league table.
+       5. Loads player stats for Florida and another team.
+       6. Rerenders comparisons when you change selections.
+       ========================================================= */
+
+    const API = "https://api-web.nhle.com/v1";
+
+    // -------------------------
+    // FALLBACK DATA
+    // -------------------------
+    // If the live NHL request fails, the page still has enough
+    // data to demonstrate how the interface works.
+
+    const fallbackStandings = [
+      {
+        abbr: "FLA",
+        name: "Florida Panthers",
+        division: "Atlantic",
+        conference: "Eastern",
+        gp: 82,
+        wins: 40,
+        losses: 38,
+        otl: 4,
+        points: 84,
+        gf: 246,
+        ga: 274,
+        diff: -28,
+        leagueRank: 25,
+        divisionRank: 7,
+        logo: "https://assets.nhle.com/logos/nhl/svg/FLA_light.svg"
+      },
+      {
+        abbr: "TBL",
+        name: "Tampa Bay Lightning",
+        division: "Atlantic",
+        conference: "Eastern",
+        gp: 82,
+        wins: 50,
+        losses: 26,
+        otl: 6,
+        points: 106,
+        gf: 286,
+        ga: 229,
+        diff: 57,
+        leagueRank: 5,
+        divisionRank: 2,
+        logo: "https://assets.nhle.com/logos/nhl/svg/TBL_light.svg"
+      },
+      {
+        abbr: "DAL",
+        name: "Dallas Stars",
+        division: "Central",
+        conference: "Western",
+        gp: 82,
+        wins: 50,
+        losses: 20,
+        otl: 12,
+        points: 112,
+        gf: 273,
+        ga: 222,
+        diff: 51,
+        leagueRank: 3,
+        divisionRank: 2,
+        logo: "https://assets.nhle.com/logos/nhl/svg/DAL_light.svg"
+      }
+    ];
+
+    const fallbackPanthersPlayers = [
+      {
+        id: 0,
+        number: 13,
+        name: "Sam Reinhart",
+        position: "F",
+        gp: 82,
+        goals: 29,
+        assists: 32,
+        points: 61,
+        plusMinus: 0,
+        pim: 0,
+        ppg: 0,
+        shg: 0,
+        gwg: 0,
+        shots: 0,
+        shootingPct: 0
+      },
+      {
+        id: 1,
+        number: 9,
+        name: "Sam Bennett",
+        position: "F",
+        gp: 82,
+        goals: 26,
+        assists: 32,
+        points: 58,
+        plusMinus: 0,
+        pim: 0,
+        ppg: 0,
+        shg: 0,
+        gwg: 0,
+        shots: 201,
+        shootingPct: 12.9
+      }
+    ];
+
+    let standings = [...fallbackStandings];
+    let panthersPlayers = [...fallbackPanthersPlayers];
+    let otherPlayers = [];
+    let selectedTeam = "TBL";
+    let leaderStat = "points";
+
+    let sortKey = "leagueRank";
+    let sortDirection = 1;
+
+    // -------------------------
+    // HELPERS
+    // -------------------------
+
+    function textValue(value) {
+      if (value == null) return "";
+      if (typeof value === "string" || typeof value === "number") return value;
+      return value.default || value.en || Object.values(value)[0] || "";
+    }
+
+    function ordinal(number) {
+      const n = Number(number);
+      if (!Number.isFinite(n)) return "—";
+      const mod100 = n % 100;
+      if (mod100 >= 11 && mod100 <= 13) return n + "th";
+      if (n % 10 === 1) return n + "st";
+      if (n % 10 === 2) return n + "nd";
+      if (n % 10 === 3) return n + "rd";
+      return n + "th";
+    }
+
+    function signed(number) {
+      const n = Number(number || 0);
+      return n > 0 ? `+${n}` : String(n);
+    }
+
+    function pct(points, gp) {
+      if (!gp) return 0;
+      return points / (gp * 2);
+    }
+
+    function safeNumber(...values) {
+      for (const value of values) {
+        if (Number.isFinite(Number(value))) return Number(value);
+      }
+      return 0;
+    }
+
+    function playerName(player) {
+      const first = textValue(player.firstName);
+      const last = textValue(player.lastName);
+      return `${first} ${last}`.trim() || player.name || "Unknown Player";
+    }
+
+    function normalizeStanding(raw) {
+      const abbr = textValue(raw.teamAbbrev) || raw.abbr || "";
+
+      return {
+        abbr,
+        name: textValue(raw.teamName) || textValue(raw.teamCommonName) || raw.name || abbr,
+        division: textValue(raw.divisionName) || raw.division || "",
+        conference: textValue(raw.conferenceName) || raw.conference || "",
+        gp: safeNumber(raw.gamesPlayed, raw.gp),
+        wins: safeNumber(raw.wins),
+        losses: safeNumber(raw.losses),
+        otl: safeNumber(raw.otLosses, raw.otl),
+        points: safeNumber(raw.points),
+        gf: safeNumber(raw.goalFor, raw.goalsFor, raw.gf),
+        ga: safeNumber(raw.goalAgainst, raw.goalsAgainst, raw.ga),
+        diff: safeNumber(raw.goalDifferential, raw.diff),
+        leagueRank: safeNumber(raw.leagueSequence, raw.leagueRank),
+        divisionRank: safeNumber(raw.divisionSequence, raw.divisionRank),
+        logo: raw.teamLogo ||
+              `https://assets.nhle.com/logos/nhl/svg/${abbr}_light.svg`
+      };
+    }
+
+    function normalizePlayer(raw) {
+      const shots = safeNumber(raw.shots, raw.shotsOnGoal);
+      const goals = safeNumber(raw.goals);
+      let shootingPct = safeNumber(raw.shootingPctg, raw.shootingPct);
+
+      // Some APIs return .154 while others might return 15.4.
+      if (shootingPct > 0 && shootingPct <= 1) shootingPct *= 100;
+      if (!shootingPct && shots) shootingPct = (goals / shots) * 100;
+
+      return {
+        id: raw.playerId ?? raw.id ?? Math.random(),
+        number: raw.sweaterNumber ?? raw.number ?? "—",
+        name: playerName(raw),
+        position: raw.positionCode || raw.position || "—",
+        gp: safeNumber(raw.gamesPlayed, raw.gp),
+        goals,
+        assists: safeNumber(raw.assists),
+        points: safeNumber(raw.points, goals + safeNumber(raw.assists)),
+        plusMinus: safeNumber(raw.plusMinus),
+        pim: safeNumber(raw.penaltyMinutes, raw.pim),
+        ppg: safeNumber(raw.powerPlayGoals, raw.ppg),
+        shg: safeNumber(raw.shorthandedGoals, raw.shg),
+        gwg: safeNumber(raw.gameWinningGoals, raw.gwg),
+        shots,
+        shootingPct
+      };
+    }
+
+    function getFlorida() {
+      return standings.find(team => team.abbr === "FLA") || fallbackStandings[0];
+    }
+
+    function getOther() {
+      return standings.find(team => team.abbr === selectedTeam) ||
+             standings.find(team => team.abbr !== "FLA") ||
+             fallbackStandings[1];
+    }
+
+    // -------------------------
+    // NHL DATA REQUESTS
+    // -------------------------
+
+    async function loadStandings() {
+      const response = await fetch(`${API}/standings/now`);
+      if (!response.ok) throw new Error("Standings request failed.");
+
+      const data = await response.json();
+      const rows = Array.isArray(data.standings) ? data.standings : [];
+
+      if (!rows.length) throw new Error("No standings rows were returned.");
+
+      standings = rows.map(normalizeStanding);
+    }
+
+    async function loadClubPlayers(teamAbbr) {
+      const response = await fetch(`${API}/club-stats/${teamAbbr}/now`);
+      if (!response.ok) throw new Error(`Player request failed for ${teamAbbr}.`);
+
+      const data = await response.json();
+      const skaters = Array.isArray(data.skaters) ? data.skaters : [];
+
+      return {
+        season: data.season,
+        gameType: data.gameType,
+        players: skaters.map(normalizePlayer)
+      };
+    }
+
+    async function initializeLiveData() {
+      const status = document.getElementById("dataStatus");
+      const dot = document.getElementById("statusDot");
+      const errorBox = document.getElementById("errorBox");
+
+      try {
+        await loadStandings();
+
+        const floridaResult = await loadClubPlayers("FLA");
+        if (floridaResult.players.length) {
+          panthersPlayers = floridaResult.players;
+        }
+
+        status.textContent = "Live NHL data loaded";
+        dot.style.background = "#7CE7B3";
+
+        // Try to load the default comparison team's players.
+        try {
+          const otherResult = await loadClubPlayers(selectedTeam);
+          otherPlayers = otherResult.players;
+        } catch (innerError) {
+          otherPlayers = [];
+        }
+
+        errorBox.style.display = "none";
+      } catch (error) {
+        status.textContent = "Offline demo data";
+        dot.style.background = "#FEC84B";
+
+        errorBox.style.display = "block";
+        errorBox.textContent =
+          "The browser could not reach the NHL feed, so this page is using its built-in fallback data. " +
+          "The HTML/CSS/JavaScript still works; player comparison options may be limited.";
+      }
+
+      renderEverything();
+    }
+
+    // -------------------------
+    // OVERVIEW
+    // -------------------------
+
+    function renderOverview() {
+      const fla = getFlorida();
+
+      document.getElementById("recordValue").textContent =
+        `${fla.wins}-${fla.losses}-${fla.otl}`;
+
+      document.getElementById("pointsValue").textContent = fla.points;
+      document.getElementById("pointsSub").textContent = `${fla.gp} games`;
+
+      document.getElementById("gfValue").textContent = fla.gf;
+      document.getElementById("gaValue").textContent = fla.ga;
+
+      document.getElementById("gfSub").textContent =
+        fla.gp ? `${(fla.gf / fla.gp).toFixed(2)} per game` : "—";
+
+      document.getElementById("gaSub").textContent =
+        fla.gp ? `${(fla.ga / fla.gp).toFixed(2)} per game` : "—";
+
+      const diffEl = document.getElementById("diffValue");
+      diffEl.textContent = signed(fla.diff);
+      diffEl.classList.toggle("positive", fla.diff > 0);
+      diffEl.classList.toggle("negative", fla.diff < 0);
+
+      document.getElementById("rankValue").textContent = ordinal(fla.leagueRank);
+      document.getElementById("rankSub").textContent =
+        `${ordinal(fla.divisionRank)} ${fla.division || "division"}`;
+    }
+
+    // -------------------------
+    // TEAM DROPDOWN + COMPARISON
+    // -------------------------
+
+    function populateTeamSelect() {
+      const select = document.getElementById("teamSelect");
+      const oldValue = selectedTeam;
+
+      const options = standings
+        .filter(team => team.abbr !== "FLA")
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map(team =>
+          `<option value="${team.abbr}">${team.name}</option>`
+        )
+        .join("");
+
+      select.innerHTML = options;
+
+      if (standings.some(team => team.abbr === oldValue)) {
+        select.value = oldValue;
+      } else if (select.options.length) {
+        selectedTeam = select.options[0].value;
+        select.value = selectedTeam;
+      }
+    }
+
+    function metricHTML(label, leftValue, rightValue, higherIsBetter = true, formatter = value => value) {
+      const max = Math.max(Math.abs(leftValue), Math.abs(rightValue), 1);
+      const leftWidth = Math.min(100, (Math.abs(leftValue) / max) * 100);
+      const rightWidth = Math.min(100, (Math.abs(rightValue) / max) * 100);
+
+      let leftClass = "";
+      let rightClass = "";
+
+      if (leftValue !== rightValue) {
+        const leftWins = higherIsBetter ? leftValue > rightValue : leftValue < rightValue;
+        leftClass = leftWins ? "positive" : "";
+        rightClass = leftWins ? "" : "positive";
+      }
+
+      return `
+        <div class="metric-row">
+          <div class="metric-label">
+            <span class="${leftClass}">${formatter(leftValue)}</span>
+            <span>${label}</span>
+            <span class="${rightClass}">${formatter(rightValue)}</span>
+          </div>
+
+          <div class="dual-bar">
+            <div class="bar-left-wrap">
+              <div class="bar-left" style="width:${leftWidth}%"></div>
+            </div>
+            <div class="bar-right-wrap">
+              <div class="bar-right" style="width:${rightWidth}%"></div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTeamComparison() {
+      const fla = getFlorida();
+      const other = getOther();
+
+      document.getElementById("flaCompareRecord").textContent =
+        `${fla.wins}-${fla.losses}-${fla.otl}`;
+      document.getElementById("flaComparePoints").textContent = fla.points;
+      document.getElementById("flaCompareLogo").src = fla.logo;
+
+      document.getElementById("otherCompareName").textContent = other.name;
+      document.getElementById("otherCompareRecord").textContent =
+        `${other.wins}-${other.losses}-${other.otl}`;
+      document.getElementById("otherComparePoints").textContent = other.points;
+      document.getElementById("otherCompareLogo").src = other.logo;
+      document.getElementById("otherCompareLogo").alt = `${other.name} logo`;
+
+      const flaPointsPct = pct(fla.points, fla.gp) * 100;
+      const otherPointsPct = pct(other.points, other.gp) * 100;
+      const flaGFPG = fla.gp ? fla.gf / fla.gp : 0;
+      const otherGFPG = other.gp ? other.gf / other.gp : 0;
+      const flaGAPG = fla.gp ? fla.ga / fla.gp : 0;
+      const otherGAPG = other.gp ? other.ga / other.gp : 0;
+
+      document.getElementById("comparisonBars").innerHTML =
+        metricHTML("Standings Points", fla.points, other.points) +
+        metricHTML("Wins", fla.wins, other.wins) +
+        metricHTML("Points %", flaPointsPct, otherPointsPct, true, v => `${v.toFixed(1)}%`) +
+        metricHTML("Goals For", fla.gf, other.gf) +
+        metricHTML("Goals Against", fla.ga, other.ga, false) +
+        metricHTML("Goal Differential", fla.diff, other.diff, true, signed) +
+        metricHTML("Goals / Game", flaGFPG, otherGFPG, true, v => v.toFixed(2)) +
+        metricHTML("GA / Game", flaGAPG, otherGAPG, false, v => v.toFixed(2));
+    }
+
+    // -------------------------
+    // STANDINGS TABLE
+    // -------------------------
+
+    function renderStandings() {
+      const query = document.getElementById("teamSearch").value.trim().toLowerCase();
+
+      let rows = standings.filter(team => {
+        const haystack =
+          `${team.name} ${team.abbr} ${team.division} ${team.conference}`.toLowerCase();
+        return haystack.includes(query);
+      });
+
+      rows.sort((a, b) => {
+        const av = a[sortKey];
+        const bv = b[sortKey];
+
+        if (typeof av === "string") {
+          return av.localeCompare(bv) * sortDirection;
+        }
+
+        return (av - bv) * sortDirection;
+      });
+
+      document.getElementById("standingsCount").textContent =
+        `${rows.length} team${rows.length === 1 ? "" : "s"}`;
+
+      document.getElementById("standingsBody").innerHTML = rows.map(team => `
+        <tr class="${team.abbr === "FLA" ? "highlight" : ""}">
+          <td>${team.leagueRank || "—"}</td>
+          <td>
+            <div class="mini-team">
+              <img src="${team.logo}" alt="">
+              <span>${team.name}</span>
+            </div>
+          </td>
+          <td>${team.division || "—"}</td>
+          <td>${team.gp}</td>
+          <td>${team.wins}</td>
+          <td>${team.losses}</td>
+          <td>${team.otl}</td>
+          <td><strong>${team.points}</strong></td>
+          <td>${team.gf}</td>
+          <td>${team.ga}</td>
+          <td class="${team.diff > 0 ? "positive" : team.diff < 0 ? "negative" : ""}">
+            ${signed(team.diff)}
+          </td>
+          <td>${(pct(team.points, team.gp) * 100).toFixed(1)}%</td>
+        </tr>
+      `).join("");
+    }
+
+    // -------------------------
+    // PANTHERS PLAYERS
+    // -------------------------
+
+    function renderPlayerLeaders() {
+      const players = [...panthersPlayers].sort(
+        (a, b) => (b[leaderStat] || 0) - (a[leaderStat] || 0)
+      );
+
+      const topThree = players.slice(0, 3);
+
+      document.getElementById("leaderGrid").innerHTML = topThree.map((player, index) => `
+        <div class="card leader-card">
+          <div class="leader-rank">#${index + 1}</div>
+          <div class="stat-label">${leaderStat}</div>
+          <div class="leader-name">${player.name}</div>
+          <div class="leader-pos">${player.position} • ${player.gp} GP</div>
+          <div class="leader-number">${formatPlayerStat(player, leaderStat)}</div>
+        </div>
+      `).join("");
+
+      document.getElementById("panthersPlayersBody").innerHTML =
+        [...panthersPlayers]
+          .sort((a, b) => b.points - a.points)
+          .map(player => `
+            <tr>
+              <td><strong>${player.name}</strong></td>
+              <td>${player.position}</td>
+              <td>${player.gp}</td>
+              <td>${player.goals}</td>
+              <td>${player.assists}</td>
+              <td><strong>${player.points}</strong></td>
+              <td>${signed(player.plusMinus)}</td>
+              <td>${player.pim}</td>
+              <td>${player.ppg}</td>
+              <td>${player.shg}</td>
+              <td>${player.gwg}</td>
+              <td>${player.shots}</td>
+              <td>${player.shootingPct.toFixed(1)}%</td>
+            </tr>
+          `).join("");
+
+      populatePlayerSelects();
+    }
+
+    function formatPlayerStat(player, stat) {
+      if (stat === "shootingPct") return `${player[stat].toFixed(1)}%`;
+      return player[stat] ?? 0;
+    }
+
+    function populatePlayerSelects() {
+      const left = document.getElementById("pantherPlayerSelect");
+      const right = document.getElementById("otherPlayerSelect");
+
+      const oldLeft = left.value;
+      const oldRight = right.value;
+
+      left.innerHTML = [...panthersPlayers]
+        .sort((a, b) => b.points - a.points)
+        .map(player => `<option value="${player.id}">${player.name}</option>`)
+        .join("");
+
+      right.innerHTML = otherPlayers.length
+        ? [...otherPlayers]
+            .sort((a, b) => b.points - a.points)
+            .map(player => `<option value="${player.id}">${player.name}</option>`)
+            .join("")
+        : `<option value="">No live opponent players</option>`;
+
+      if ([...left.options].some(option => option.value === oldLeft)) {
+        left.value = oldLeft;
+      }
+
+      if ([...right.options].some(option => option.value === oldRight)) {
+        right.value = oldRight;
+      }
+
+      renderPlayerComparison();
+    }
+
+    // -------------------------
+    // PLAYER VS PLAYER
+    // -------------------------
+
+    function findPlayer(players, id) {
+      return players.find(player => String(player.id) === String(id));
+    }
+
+    function renderPlayerComparison() {
+      const leftSelect = document.getElementById("pantherPlayerSelect");
+      const rightSelect = document.getElementById("otherPlayerSelect");
+
+      const left =
+        findPlayer(panthersPlayers, leftSelect.value) ||
+        panthersPlayers[0];
+
+      const right =
+        findPlayer(otherPlayers, rightSelect.value);
+
+      if (!left) return;
+
+      document.getElementById("leftJersey").textContent = left.number || "—";
+      document.getElementById("leftPlayerName").textContent = left.name;
+      document.getElementById("leftPlayerMeta").textContent =
+        `${left.position} • Florida Panthers`;
+
+      const otherTeam = getOther();
+
+      if (!right) {
+        document.getElementById("rightJersey").textContent = "—";
+        document.getElementById("rightPlayerName").textContent =
+          "Opponent data unavailable";
+        document.getElementById("rightPlayerMeta").textContent = otherTeam.name;
+
+        document.getElementById("playerComparisonBars").innerHTML = `
+          <p style="color:#667085; margin:0; line-height:1.6;">
+            The team comparison still works. Player-vs-player needs the live club-stats request
+            for ${otherTeam.name}.
+          </p>
+        `;
+
+        document.getElementById("leftWinner").style.display = "none";
+        document.getElementById("rightWinner").style.display = "none";
+        return;
+      }
+
+      document.getElementById("rightJersey").textContent = right.number || "—";
+      document.getElementById("rightPlayerName").textContent = right.name;
+      document.getElementById("rightPlayerMeta").textContent =
+        `${right.position} • ${otherTeam.name}`;
+
+      const metrics = [
+        ["Games Played", "gp", true],
+        ["Goals", "goals", true],
+        ["Assists", "assists", true],
+        ["Points", "points", true],
+        ["Plus / Minus", "plusMinus", true],
+        ["Shots", "shots", true],
+        ["Shooting %", "shootingPct", true]
+      ];
+
+      document.getElementById("playerComparisonBars").innerHTML =
+        metrics.map(([label, key, higherIsBetter]) => {
+          const formatter =
+            key === "shootingPct"
+              ? value => `${Number(value).toFixed(1)}%`
+              : key === "plusMinus"
+              ? signed
+              : value => value;
+
+          return metricHTML(
+            label,
+            left[key] || 0,
+            right[key] || 0,
+            higherIsBetter,
+            formatter
+          );
+        }).join("");
+
+      // A simple "score" just for this comparison card.
+      const leftScore =
+        left.goals * 2 + left.assists + left.points + left.shots * .05;
+      const rightScore =
+        right.goals * 2 + right.assists + right.points + right.shots * .05;
+
+      document.getElementById("leftWinner").style.display =
+        leftScore > rightScore ? "inline-block" : "none";
+
+      document.getElementById("rightWinner").style.display =
+        rightScore > leftScore ? "inline-block" : "none";
+    }
+
+    async function changeComparisonTeam(abbr) {
+      selectedTeam = abbr;
+      otherPlayers = [];
+
+      renderTeamComparison();
+      populatePlayerSelects();
+
+      try {
+        const result = await loadClubPlayers(abbr);
+        otherPlayers = result.players;
+      } catch (error) {
+        otherPlayers = [];
+      }
+
+      populatePlayerSelects();
+    }
+
+    // -------------------------
+    // MAIN RENDER
+    // -------------------------
+
+    function renderEverything() {
+      populateTeamSelect();
+      renderOverview();
+      renderTeamComparison();
+      renderStandings();
+      renderPlayerLeaders();
+    }
+
+    // -------------------------
+    // EVENT LISTENERS
+    // -------------------------
+    // Event listeners tell JavaScript what to do after a click,
+    // selection change, or keyboard input.
+
+    document.getElementById("teamSelect").addEventListener("change", event => {
+      changeComparisonTeam(event.target.value);
+    });
+
+    document.getElementById("teamSearch").addEventListener("input", renderStandings);
+
+    document.querySelectorAll("th[data-sort]").forEach(th => {
+      th.addEventListener("click", () => {
+        const newKey = th.dataset.sort;
+
+        if (sortKey === newKey) {
+          sortDirection *= -1;
+        } else {
+          sortKey = newKey;
+          sortDirection = newKey === "name" || newKey === "division" ? 1 : -1;
+        }
+
+        renderStandings();
+      });
+    });
+
+    document.getElementById("leaderButtons").addEventListener("click", event => {
+      const button = event.target.closest("button[data-stat]");
+      if (!button) return;
+
+      leaderStat = button.dataset.stat;
+
+      document.querySelectorAll("#leaderButtons button").forEach(btn => {
+        btn.classList.toggle("active", btn === button);
+      });
+
+      renderPlayerLeaders();
+    });
+
+    document.getElementById("pantherPlayerSelect").addEventListener(
+      "change",
+      renderPlayerComparison
+    );
+
+    document.getElementById("otherPlayerSelect").addEventListener(
+      "change",
+      renderPlayerComparison
+    );
+
+    // First render immediately using fallback data.
+    renderEverything();
+
+    // Then replace it with live NHL data if the request succeeds.
+    initializeLiveData();
+  </script>
+</body>
+</html>
