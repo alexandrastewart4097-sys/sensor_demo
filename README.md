@@ -2,5 +2,4 @@
 
 ## Notes
 
-* item 1
-* item 2
+We want to look at the sensors on a smart phone
